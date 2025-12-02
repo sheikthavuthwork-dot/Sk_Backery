@@ -2,7 +2,7 @@
 
 
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -11,7 +11,9 @@ import {
   useParams,
   Link,
 } from "react-router-dom";
+import { generateToken, setupForegroundListener } from "./notification/firebase";
 import "./App.css";
+
 
 function Home() {
   return (
@@ -324,6 +326,23 @@ function Contact({ formData, errors, submitted, handleChange, handleSubmit }) {
 }
 
 function App() {
+  const [fcmToken, setFcmToken] = useState(null);
+
+  useEffect(() => {
+    const initializeFCM = async () => {
+      const token = await generateToken();
+      if (token) {
+        setFcmToken(token);
+        setupForegroundListener();
+      }
+    };
+    initializeFCM();
+  }, []);
+
+
+
+
+
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
@@ -402,14 +421,20 @@ function App() {
         <header className="top">
           <div className="h1">
             <h1>SK Bakery</h1>
+            {fcmToken && <div style={{ fontSize: '10px', color: '#666' }}>FCM Ready ✓</div>}
           </div>
 
           <nav className="nav">
-            <NavLink to="/" end>
-              Home
-            </NavLink>
+            <NavLink to="/" end>Home</NavLink>
             <NavLink to="/menu">Menu</NavLink>
             <NavLink to="/contact">Contact</NavLink>
+            <button 
+              onClick={() => fcmToken && navigator.clipboard.writeText(fcmToken)}
+              style={{ background: 'none', border: '1px solid #ccc', padding: '5px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
+              title="Copy FCM Token"
+            >
+              📋 Token
+            </button>
           </nav>
         </header>
 

@@ -60,7 +60,7 @@ body {
   background: #ff7b9c;
   width: 0;
   transition: width 0.3s ease;
-  margin-top: 5px;
+  margin-top: 5px; 
 }
 
 .nav a:hover {
